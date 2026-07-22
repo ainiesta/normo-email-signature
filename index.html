@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Generador de firmas · NORMO</title>
+<style>
+  :root{
+    --tinta:#1A1A1A; --papel:#FAF9F6; --verde:#0E8A52; --amarillo:#F2DC00;
+    --linea:rgba(26,26,26,.14); --gris:#6b6b6b;
+    --mono:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--papel);color:var(--tinta);font-family:var(--sans);
+       -webkit-font-smoothing:antialiased;line-height:1.5}
+  .wrap{max-width:1100px;margin:0 auto;padding:40px 28px 80px}
+
+  /* cabecera tipo blueprint */
+  header{border-bottom:1px solid var(--tinta);padding-bottom:18px;margin-bottom:34px;
+         display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap}
+  .h-l{display:flex;flex-direction:column;gap:6px}
+  .ref{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--gris)}
+  h1{font-size:24px;margin:0;letter-spacing:-.01em;font-weight:600}
+  .coord{font-family:var(--mono);font-size:11px;color:var(--gris);letter-spacing:.08em;text-align:right}
+
+  .grid{display:grid;grid-template-columns:minmax(0,360px) 1fr;gap:48px;align-items:start}
+  @media(max-width:820px){.grid{grid-template-columns:1fr;gap:34px}}
+
+  /* formulario */
+  .panel-label{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+               color:var(--gris);margin:0 0 16px;display:flex;align-items:center;gap:10px}
+  .panel-label::before{content:"";width:18px;height:1px;background:var(--tinta);display:inline-block}
+  .field{margin-bottom:18px}
+  .field label{display:block;font-family:var(--mono);font-size:11px;letter-spacing:.08em;
+               text-transform:uppercase;color:var(--gris);margin-bottom:6px}
+  .field input{width:100%;padding:11px 13px;border:1px solid var(--linea);background:#fff;
+               font-family:var(--sans);font-size:14px;color:var(--tinta);border-radius:0;outline:none;
+               transition:border-color .15s}
+  .field input:focus{border-color:var(--verde)}
+  .field .hint{font-size:11px;color:var(--gris);margin-top:5px;font-family:var(--mono);letter-spacing:.03em}
+
+  .actions{display:flex;gap:10px;margin-top:24px;flex-wrap:wrap}
+  button{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;
+          padding:13px 18px;border:1px solid var(--tinta);background:var(--tinta);color:var(--papel);
+          cursor:pointer;transition:.15s}
+  button:hover{background:#000}
+  button.ghost{background:transparent;color:var(--tinta)}
+  button.ghost:hover{background:var(--tinta);color:var(--papel)}
+  .copied{color:var(--verde)!important;border-color:var(--verde)!important;background:transparent!important}
+
+  /* preview */
+  .preview-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+  .stage{border:1px solid var(--linea);background:#fff;padding:34px 30px;
+         background-image:linear-gradient(var(--linea) 1px,transparent 1px),
+                          linear-gradient(90deg,var(--linea) 1px,transparent 1px);
+         background-size:22px 22px;background-position:-1px -1px}
+  .stage-inner{background:#fff;display:inline-block;padding:4px}
+  .note{margin-top:26px;border-top:1px solid var(--linea);padding-top:20px}
+  .note h3{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+           color:var(--gris);margin:0 0 12px}
+  .note ol{margin:0;padding-left:18px;font-size:13px;color:#333}
+  .note li{margin-bottom:8px}
+  .note code{font-family:var(--mono);font-size:12px;background:#f0efea;padding:1px 5px}
+  .toggle{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:11px;
+          letter-spacing:.06em;color:var(--gris);text-transform:uppercase;cursor:pointer;user-select:none}
+  .toggle input{width:auto;margin:0;accent-color:var(--verde)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="h-l">
+      <span class="ref">NORMO · SISTEMA DE MARCA · REF&nbsp;EML-SIG-01</span>
+      <h1>Generador de firmas de email</h1>
+    </div>
+    <div class="coord">Rellena · previsualiza · copia<br>Tipografía de sistema · logo embebido</div>
+  </header>
+
+  <div class="grid">
+    <!-- FORM -->
+    <section>
+      <p class="panel-label">Datos</p>
+      <div class="field">
+        <label>Nombre y apellidos</label>
+        <input id="f-name" type="text" value="Joxemari Gallastegi" autocomplete="off">
+      </div>
+      <div class="field">
+        <label>Cargo</label>
+        <input id="f-role" type="text" value="Fundador" autocomplete="off">
+      </div>
+      <div class="field">
+        <label>Teléfono móvil</label>
+        <input id="f-tel" type="text" value="+34 600 000 000" autocomplete="off">
+      </div>
+      <div class="field">
+        <label>Email</label>
+        <input id="f-email" type="text" value="joxemari@normo.es" autocomplete="off">
+        <div class="hint">Usa el dominio real de la cuenta (.es o .com)</div>
+      </div>
+      <div class="field">
+        <label>Web</label>
+        <input id="f-web" type="text" value="normo.es" autocomplete="off">
+      </div>
+      <div class="field">
+        <label>LinkedIn (URL completa)</label>
+        <input id="f-li" type="text" value="https://www.linkedin.com/company/normo" autocomplete="off">
+        <div class="hint">Perfil personal o de empresa</div>
+      </div>
+      <div class="field">
+        <label class="toggle" style="margin-bottom:8px;text-transform:uppercase;"><input type="checkbox" id="f-claim-on" checked> Incluir claim bajo el logo</label>
+        <input id="f-claim" type="text" value="Más de 85 años protegiendo lo que importa dentro de un edificio. Ahora también inteligente." autocomplete="off">
+        <div class="hint">Se muestra entre el logo y la línea de cota</div>
+      </div>
+      <div class="field">
+        <label>URL del logo (opcional · solo para Outlook)</label>
+        <input id="f-logo" type="text" value="" placeholder="https://normo.es/firma-logo.png" autocomplete="off">
+        <div class="hint">Vacío = logo embebido (perfecto para Gmail)</div>
+      </div>
+
+      <div class="actions">
+        <button id="btn-copy">Copiar firma</button>
+        <button id="btn-html" class="ghost">Descargar .html</button>
+      </div>
+    </section>
+
+    <!-- PREVIEW -->
+    <section>
+      <div class="preview-head">
+        <p class="panel-label" style="margin:0">Previsualización</p>
+        <label class="toggle"><input type="checkbox" id="t-dark"> Simular dark&nbsp;mode</label>
+      </div>
+      <div class="stage" id="stage">
+        <div class="stage-inner" id="stage-inner"></div>
+      </div>
+
+      <div class="note">
+        <h3>Cómo instalarla</h3>
+        <ol>
+          <li><strong>Gmail / Google Workspace:</strong> pulsa <code>Copiar firma</code>, ve a <em>Configuración → General → Firma</em>, crea una nueva y pega (Ctrl/Cmd+V).</li>
+          <li><strong>Apple Mail:</strong> <em>Ajustes → Firmas</em>, desmarca “usar fuente de mensaje”, y pega.</li>
+          <li><strong>Outlook:</strong> rellena el campo <em>URL del logo</em> con la imagen ya alojada (Outlook no muestra logos embebidos) y luego copia.</li>
+          <li><strong>Dark&nbsp;mode:</strong> Gmail muestra los correos sobre fondo blanco, así que la firma se ve siempre bien. Solo Apple Mail puede invertir el fondo y oscurecer el logo (test con el toggle).</li>
+        </ol>
+      </div>
+    </section>
+  </div>
+</div>
+
+<script>
+var LOGO_EMBED = "data:image/png;base64,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";
+
+function esc(s){return (s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
+function telHref(t){return "tel:"+(t||"").replace(/[^+0-9]/g,"");}
+
+function buildSignature(){
+  var name = esc(document.getElementById('f-name').value);
+  var role = esc(document.getElementById('f-role').value);
+  var tel  = document.getElementById('f-tel').value.trim();
+  var email= document.getElementById('f-email').value.trim();
+  var web  = document.getElementById('f-web').value.trim().replace(/^https?:\/\//,'');
+  var li   = document.getElementById('f-li').value.trim();
+  var logoUrl = document.getElementById('f-logo').value.trim();
+  var logoSrc = logoUrl ? esc(logoUrl) : LOGO_EMBED;
+
+  var TINTA="#1A1A1A", VERDE="#0E8A52", GRIS="#6b6b6b";
+  var FONT='font-family:-apple-system,BlinkMacSystemFont,\'Segoe UI\',Roboto,Helvetica,Arial,sans-serif;';
+
+  function row(lbl,val){
+    return ''
+    + '<tr>'
+    +   '<td style="padding:1px 14px 1px 0;'+FONT+'font-size:11px;line-height:18px;color:'+GRIS+';letter-spacing:.06em;text-transform:uppercase;vertical-align:top;white-space:nowrap;">'+lbl+'</td>'
+    +   '<td style="padding:1px 0;'+FONT+'font-size:13px;line-height:18px;color:'+TINTA+';vertical-align:top;">'+val+'</td>'
+    + '</tr>';
+  }
+
+  var rows = '';
+  if(tel)   rows += row('T','<a href="'+telHref(tel)+'" style="color:'+TINTA+';text-decoration:none;">'+esc(tel)+'</a>');
+  if(email) rows += row('E','<a href="mailto:'+esc(email)+'" style="color:'+TINTA+';text-decoration:none;">'+esc(email)+'</a>');
+  if(web)   rows += row('W','<a href="https://'+esc(web)+'" style="color:'+VERDE+';text-decoration:none;">'+esc(web)+'</a>');
+  if(li)    rows += row('in','<a href="'+esc(li)+'" style="color:'+TINTA+';text-decoration:none;">LinkedIn</a>');
+
+  var claimOn = document.getElementById('f-claim-on').checked;
+  var claim = esc(document.getElementById('f-claim').value);
+
+  // línea de cota (dimension line): tick + línea + tick
+  var dimLine =
+    '<table cellpadding="0" cellspacing="0" border="0" role="presentation" style="border-collapse:collapse;">'
+    + '<tr>'
+    +   '<td style="width:1px;height:7px;background:'+TINTA+';font-size:0;line-height:0;">&nbsp;</td>'
+    +   '<td style="border-top:1px solid '+TINTA+';width:298px;height:7px;font-size:0;line-height:0;vertical-align:top;">&nbsp;</td>'
+    +   '<td style="width:1px;height:7px;background:'+TINTA+';font-size:0;line-height:0;">&nbsp;</td>'
+    + '</tr>'
+    + '</table>';
+
+  var claimRow = (claimOn && claim)
+    ? '<tr><td style="padding:0 0 9px 0;'+FONT+'font-size:12px;line-height:16px;color:'+TINTA+';width:300px;letter-spacing:.005em;">'+claim+'</td></tr>'
+    : '';
+
+  var html =
+  '<table cellpadding="0" cellspacing="0" border="0" role="presentation" style="border-collapse:collapse;'+FONT+'">'
+  + '<tr><td style="padding:0 0 '+(claimOn&&claim?'9':'9')+'px 0;">'
+  +   '<img src="'+logoSrc+'" width="120" height="22" alt="NORMO" style="display:block;border:0;outline:none;height:22px;width:120px;">'
+  + '</td></tr>'
+  + claimRow
+  + '<tr><td style="padding:0 0 10px 0;">'+dimLine+'</td></tr>'
+  + '<tr><td style="padding:0 0 2px 0;'+FONT+'font-size:14px;line-height:20px;color:'+TINTA+';font-weight:600;">'+name+'</td></tr>'
+  + '<tr><td style="padding:0 0 11px 0;'+FONT+'font-size:13px;line-height:18px;color:'+GRIS+';">'+role+'<span style="color:'+GRIS+';"> · </span><span style="color:'+TINTA+';letter-spacing:.04em;">NORMO</span></td></tr>'
+  + '<tr><td>'
+  +   '<table cellpadding="0" cellspacing="0" border="0" role="presentation" style="border-collapse:collapse;">'+rows+'</table>'
+  + '</td></tr>'
+  + '</table>';
+
+  return html;
+}
+
+function render(){
+  document.getElementById('stage-inner').innerHTML = buildSignature();
+}
+
+['f-name','f-role','f-tel','f-email','f-web','f-li','f-logo','f-claim'].forEach(function(id){
+  document.getElementById(id).addEventListener('input', render);
+});
+document.getElementById('f-claim-on').addEventListener('change', render);
+
+document.getElementById('t-dark').addEventListener('change', function(e){
+  var st=document.getElementById('stage'), si=document.getElementById('stage-inner');
+  if(e.target.checked){ st.style.background='#1A1A1A'; st.style.backgroundImage='none'; si.style.background='#1A1A1A'; }
+  else{ st.style.background='#fff'; si.style.background='#fff';
+        st.style.backgroundImage="linear-gradient(rgba(26,26,26,.14) 1px,transparent 1px),linear-gradient(90deg,rgba(26,26,26,.14) 1px,transparent 1px)";
+        st.style.backgroundSize='22px 22px'; }
+});
+
+document.getElementById('btn-copy').addEventListener('click', function(){
+  var html = buildSignature();
+  var btn=this;
+  function done(){ btn.textContent='Copiado ✓'; btn.classList.add('copied');
+    setTimeout(function(){btn.textContent='Copiar firma';btn.classList.remove('copied');},1800); }
+  try{
+    var blob=new Blob([html],{type:'text/html'});
+    var data=[new ClipboardItem({'text/html':blob,'text/plain':new Blob([html],{type:'text/plain'})})];
+    navigator.clipboard.write(data).then(done,function(){fallback(html,done);});
+  }catch(e){ fallback(html,done); }
+});
+
+function fallback(html,cb){
+  var t=document.createElement('div'); t.contentEditable=true; t.innerHTML=html;
+  t.style.position='fixed'; t.style.left='-9999px'; document.body.appendChild(t);
+  var r=document.createRange(); r.selectNodeContents(t);
+  var s=window.getSelection(); s.removeAllRanges(); s.addRange(r);
+  try{document.execCommand('copy');}catch(e){}
+  s.removeAllRanges(); document.body.removeChild(t); cb&&cb();
+}
+
+document.getElementById('btn-html').addEventListener('click', function(){
+  var name=document.getElementById('f-name').value.trim().replace(/\s+/g,'-').toLowerCase()||'firma';
+  var doc='<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body>'+buildSignature()+'</body></html>';
+  var blob=new Blob([doc],{type:'text/html'});
+  var a=document.createElement('a'); a.href=URL.createObjectURL(blob);
+  a.download='firma-normo-'+name+'.html'; a.click();
+});
+
+render();
+</script>
+</body>
+</html>
