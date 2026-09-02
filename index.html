@@ -132,6 +132,9 @@
           </div>
           <input type="file" id="f-photo-file" accept="image/png,image/jpeg,image/webp" style="display:none;">
           <div class="hint">Cuadrada · mínimo 400×400&nbsp;px · JPG, PNG o WebP. Se recorta y ajusta sola, sin deformarse.</div>
+          <label style="display:block;font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--gris);margin:14px 0 6px;">URL de la foto (opcional · para Outlook)</label>
+          <input id="f-photo-url" type="text" value="" placeholder="https://normo.es/firma-foto.jpg" autocomplete="off">
+          <div class="hint">Vacío = foto embebida con el recorte automático (perfecto para Gmail)</div>
         </div>
       </div>
       <div class="field">
@@ -166,7 +169,7 @@
         <ol>
           <li><strong>Gmail / Google Workspace:</strong> pulsa <code>Copiar firma</code>, ve a <em>Configuración → General → Firma</em>, crea una nueva y pega (Ctrl/Cmd+V).</li>
           <li><strong>Apple Mail:</strong> <em>Ajustes → Firmas</em>, desmarca “usar fuente de mensaje”, y pega.</li>
-          <li><strong>Outlook:</strong> rellena el campo <em>URL del logo</em> con la imagen ya alojada (Outlook no muestra logos embebidos) y luego copia. Por el mismo motivo, la fotografía tampoco se mostrará en Outlook de escritorio al ir embebida; sí se ve en Gmail, Apple Mail y la mayoría de clientes web.</li>
+          <li><strong>Outlook:</strong> rellena el campo <em>URL del logo</em> (y, si usas foto, también <em>URL de la foto</em>) con las imágenes ya alojadas — Outlook de escritorio no muestra imágenes embebidas — y luego copia. Sin esa URL, el logo y la foto sí se ven en Gmail, Apple Mail y la mayoría de clientes web.</li>
           <li><strong>Dark&nbsp;mode:</strong> Gmail muestra los correos sobre fondo blanco, así que la firma se ve siempre bien. Solo Apple Mail puede invertir el fondo y oscurecer el logo (test con el toggle).</li>
         </ol>
       </div>
@@ -243,14 +246,16 @@ function buildSignature(){
   + '</table>';
 
   var photoOn = document.getElementById('f-photo-on').checked;
-  if(photoOn && photoDataUrl){
+  var photoUrl = document.getElementById('f-photo-url').value.trim();
+  var photoSrc = photoOn ? (photoUrl ? esc(photoUrl) : photoDataUrl) : '';
+  if(photoSrc){
     html =
     '<table cellpadding="0" cellspacing="0" border="0" role="presentation" style="border-collapse:collapse;">'
     + '<tr>'
     +   '<td style="padding:0 20px 0 0;vertical-align:top;">'
     +     '<table cellpadding="0" cellspacing="0" border="0" role="presentation" style="border-collapse:collapse;">'
     +     '<tr><td style="padding:3px;border:1px solid #DADAD2;background:#ffffff;">'
-    +       '<img src="'+photoDataUrl+'" width="'+PHOTO_SIZE+'" height="'+PHOTO_SIZE+'" alt="" style="display:block;border:0;outline:none;width:'+PHOTO_SIZE+'px;height:'+PHOTO_SIZE+'px;object-fit:cover;">'
+    +       '<img src="'+photoSrc+'" width="'+PHOTO_SIZE+'" height="'+PHOTO_SIZE+'" alt="" style="display:block;border:0;outline:none;width:'+PHOTO_SIZE+'px;height:'+PHOTO_SIZE+'px;object-fit:cover;">'
     +     '</td></tr>'
     +     '</table>'
     +   '</td>'
@@ -302,7 +307,7 @@ function processPhotoFile(file){
   reader.readAsDataURL(file);
 }
 
-['f-name','f-role','f-tel','f-email','f-web','f-li','f-logo','f-claim'].forEach(function(id){
+['f-name','f-role','f-tel','f-email','f-web','f-li','f-logo','f-claim','f-photo-url'].forEach(function(id){
   document.getElementById(id).addEventListener('input', render);
 });
 document.getElementById('f-claim-on').addEventListener('change', render);
