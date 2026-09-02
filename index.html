@@ -65,6 +65,16 @@
   .toggle{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:11px;
           letter-spacing:.06em;color:var(--gris);text-transform:uppercase;cursor:pointer;user-select:none}
   .toggle input{width:auto;margin:0;accent-color:var(--verde)}
+
+  /* foto */
+  .photo-row{display:flex;align-items:center;gap:12px;margin-top:8px}
+  .photo-thumb{flex:0 0 auto;width:56px;height:56px;border:1px solid var(--linea);background:#fff;
+               display:flex;align-items:center;justify-content:center;overflow:hidden}
+  .photo-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+  .photo-thumb span{font-family:var(--mono);font-size:8px;letter-spacing:.05em;text-transform:uppercase;
+                     color:var(--gris);text-align:center;line-height:1.3}
+  .photo-actions{display:flex;flex-direction:column;gap:6px}
+  button.small{padding:8px 12px;font-size:10px}
 </style>
 </head>
 <body>
@@ -108,6 +118,23 @@
         <div class="hint">Perfil personal o de empresa</div>
       </div>
       <div class="field">
+        <label class="toggle" style="margin-bottom:8px;text-transform:uppercase;"><input type="checkbox" id="f-photo-on"> Incluir fotografía</label>
+        <div id="photo-controls" style="display:none;">
+          <div class="photo-row">
+            <div class="photo-thumb" id="photo-thumb">
+              <span id="photo-thumb-empty">Sin&nbsp;foto</span>
+              <img id="photo-thumb-img" alt="" style="display:none;">
+            </div>
+            <div class="photo-actions">
+              <button type="button" id="btn-photo-pick" class="ghost small">Subir foto</button>
+              <button type="button" id="btn-photo-remove" class="ghost small" style="display:none;">Eliminar</button>
+            </div>
+          </div>
+          <input type="file" id="f-photo-file" accept="image/png,image/jpeg,image/webp" style="display:none;">
+          <div class="hint">Cuadrada · mínimo 400×400&nbsp;px · JPG, PNG o WebP. Se recorta y ajusta sola, sin deformarse.</div>
+        </div>
+      </div>
+      <div class="field">
         <label class="toggle" style="margin-bottom:8px;text-transform:uppercase;"><input type="checkbox" id="f-claim-on" checked> Incluir claim bajo el logo</label>
         <input id="f-claim" type="text" value="Más de 85 años protegiendo lo que importa dentro de un edificio. Ahora también inteligente." autocomplete="off">
         <div class="hint">Se muestra entre el logo y la línea de cota</div>
@@ -139,7 +166,7 @@
         <ol>
           <li><strong>Gmail / Google Workspace:</strong> pulsa <code>Copiar firma</code>, ve a <em>Configuración → General → Firma</em>, crea una nueva y pega (Ctrl/Cmd+V).</li>
           <li><strong>Apple Mail:</strong> <em>Ajustes → Firmas</em>, desmarca “usar fuente de mensaje”, y pega.</li>
-          <li><strong>Outlook:</strong> rellena el campo <em>URL del logo</em> con la imagen ya alojada (Outlook no muestra logos embebidos) y luego copia.</li>
+          <li><strong>Outlook:</strong> rellena el campo <em>URL del logo</em> con la imagen ya alojada (Outlook no muestra logos embebidos) y luego copia. Por el mismo motivo, la fotografía tampoco se mostrará en Outlook de escritorio al ir embebida; sí se ve en Gmail, Apple Mail y la mayoría de clientes web.</li>
           <li><strong>Dark&nbsp;mode:</strong> Gmail muestra los correos sobre fondo blanco, así que la firma se ve siempre bien. Solo Apple Mail puede invertir el fondo y oscurecer el logo (test con el toggle).</li>
         </ol>
       </div>
@@ -149,6 +176,10 @@
 
 <script>
 var LOGO_EMBED = "data:image/png;base64,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";
+
+var photoDataUrl = null;
+var PHOTO_SIZE = 80; // px mostrados en la firma
+var PHOTO_EXPORT_PX = 240; // resolución real embebida (3x, para pantallas retina)
 
 function esc(s){return (s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
 function telHref(t){return "tel:"+(t||"").replace(/[^+0-9]/g,"");}
@@ -211,6 +242,23 @@ function buildSignature(){
   + '</td></tr>'
   + '</table>';
 
+  var photoOn = document.getElementById('f-photo-on').checked;
+  if(photoOn && photoDataUrl){
+    html =
+    '<table cellpadding="0" cellspacing="0" border="0" role="presentation" style="border-collapse:collapse;">'
+    + '<tr>'
+    +   '<td style="padding:0 20px 0 0;vertical-align:top;">'
+    +     '<table cellpadding="0" cellspacing="0" border="0" role="presentation" style="border-collapse:collapse;">'
+    +     '<tr><td style="padding:3px;border:1px solid #DADAD2;background:#ffffff;">'
+    +       '<img src="'+photoDataUrl+'" width="'+PHOTO_SIZE+'" height="'+PHOTO_SIZE+'" alt="" style="display:block;border:0;outline:none;width:'+PHOTO_SIZE+'px;height:'+PHOTO_SIZE+'px;object-fit:cover;">'
+    +     '</td></tr>'
+    +     '</table>'
+    +   '</td>'
+    +   '<td style="vertical-align:top;">'+html+'</td>'
+    + '</tr>'
+    + '</table>';
+  }
+
   return html;
 }
 
@@ -218,10 +266,63 @@ function render(){
   document.getElementById('stage-inner').innerHTML = buildSignature();
 }
 
+function updatePhotoPreview(){
+  var img = document.getElementById('photo-thumb-img');
+  var empty = document.getElementById('photo-thumb-empty');
+  var removeBtn = document.getElementById('btn-photo-remove');
+  if(photoDataUrl){
+    img.src = photoDataUrl; img.style.display = 'block'; empty.style.display = 'none';
+    removeBtn.style.display = '';
+  } else {
+    img.removeAttribute('src'); img.style.display = 'none'; empty.style.display = '';
+    removeBtn.style.display = 'none';
+  }
+}
+
+function processPhotoFile(file){
+  if(!file) return;
+  var reader = new FileReader();
+  reader.onload = function(ev){
+    var img = new Image();
+    img.onload = function(){
+      var side = Math.min(img.naturalWidth, img.naturalHeight);
+      var sx = (img.naturalWidth - side) / 2, sy = (img.naturalHeight - side) / 2;
+      var canvas = document.createElement('canvas');
+      canvas.width = PHOTO_EXPORT_PX; canvas.height = PHOTO_EXPORT_PX;
+      var ctx = canvas.getContext('2d');
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = 'high';
+      ctx.drawImage(img, sx, sy, side, side, 0, 0, PHOTO_EXPORT_PX, PHOTO_EXPORT_PX);
+      photoDataUrl = canvas.toDataURL('image/jpeg', 0.86);
+      updatePhotoPreview();
+      render();
+    };
+    img.src = ev.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
 ['f-name','f-role','f-tel','f-email','f-web','f-li','f-logo','f-claim'].forEach(function(id){
   document.getElementById(id).addEventListener('input', render);
 });
 document.getElementById('f-claim-on').addEventListener('change', render);
+
+document.getElementById('f-photo-on').addEventListener('change', function(e){
+  document.getElementById('photo-controls').style.display = e.target.checked ? '' : 'none';
+  render();
+});
+document.getElementById('btn-photo-pick').addEventListener('click', function(){
+  document.getElementById('f-photo-file').click();
+});
+document.getElementById('f-photo-file').addEventListener('change', function(e){
+  processPhotoFile(e.target.files && e.target.files[0]);
+});
+document.getElementById('btn-photo-remove').addEventListener('click', function(){
+  photoDataUrl = null;
+  document.getElementById('f-photo-file').value = '';
+  updatePhotoPreview();
+  render();
+});
 
 document.getElementById('t-dark').addEventListener('change', function(e){
   var st=document.getElementById('stage'), si=document.getElementById('stage-inner');
