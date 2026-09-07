@@ -158,7 +158,6 @@
     <section>
       <div class="preview-head">
         <p class="panel-label" style="margin:0">Previsualización</p>
-        <label class="toggle"><input type="checkbox" id="t-dark"> Simular dark&nbsp;mode</label>
       </div>
       <div class="stage" id="stage">
         <div class="stage-inner" id="stage-inner"></div>
@@ -170,7 +169,6 @@
           <li><strong>Gmail / Google Workspace:</strong> pulsa <code>Copiar firma</code>, ve a <em>Configuración → General → Firma</em>, crea una nueva y pega (Ctrl/Cmd+V).</li>
           <li><strong>Apple Mail:</strong> <em>Ajustes → Firmas</em>, desmarca “usar fuente de mensaje”, y pega.</li>
           <li><strong>Outlook:</strong> rellena el campo <em>URL del logo</em> (y, si usas foto, también <em>URL de la foto</em>) con las imágenes ya alojadas — Outlook de escritorio no muestra imágenes embebidas — y luego copia. Sin esa URL, el logo y la foto sí se ven en Gmail, Apple Mail y la mayoría de clientes web.</li>
-          <li><strong>Dark&nbsp;mode:</strong> Gmail muestra los correos sobre fondo blanco, así que la firma se ve siempre bien. Solo Apple Mail puede invertir el fondo y oscurecer el logo (test con el toggle).</li>
         </ol>
       </div>
     </section>
@@ -327,14 +325,6 @@ document.getElementById('btn-photo-remove').addEventListener('click', function()
   document.getElementById('f-photo-file').value = '';
   updatePhotoPreview();
   render();
-});
-
-document.getElementById('t-dark').addEventListener('change', function(e){
-  var st=document.getElementById('stage'), si=document.getElementById('stage-inner');
-  if(e.target.checked){ st.style.background='#1A1A1A'; st.style.backgroundImage='none'; si.style.background='#1A1A1A'; }
-  else{ st.style.background='#fff'; si.style.background='#fff';
-        st.style.backgroundImage="linear-gradient(rgba(26,26,26,.14) 1px,transparent 1px),linear-gradient(90deg,rgba(26,26,26,.14) 1px,transparent 1px)";
-        st.style.backgroundSize='22px 22px'; }
 });
 
 document.getElementById('btn-copy').addEventListener('click', function(){
